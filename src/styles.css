@@ -216,12 +216,12 @@
 
   /* ── Sword slash ── */
   @keyframes slash {
-    0%   { transform: translate(-96%, 96%) rotate(-28deg) scaleX(0.85); opacity: 0.72; }
-    8%   { opacity: 1; transform: translate(-58%, 58%) rotate(-28deg) scaleX(1); }
+    0%   { transform: translate(-160%, 160%) rotate(-28deg) scaleX(0.85); opacity: 0; }
+    8%   { opacity: 1; transform: translate(-110%, 110%) rotate(-28deg) scaleX(1); }
     68%  { opacity: 0.85; }
-    100% { transform: translate(140%, -140%) rotate(-28deg) scaleX(1.1); opacity: 0; }
+    100% { transform: translate(200%, -200%) rotate(-28deg) scaleX(1.1); opacity: 0; }
   }
-  .animate-slash { animation: slash 0.42s cubic-bezier(0.18, 0.72, 0.28, 1) forwards; }
+  .animate-slash { animation: slash 0.72s cubic-bezier(0.18, 0.72, 0.28, 1) forwards; }
 
   /* ── Damage vignette ── */
   @keyframes damage-vignette {
