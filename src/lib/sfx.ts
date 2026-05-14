@@ -10,6 +10,11 @@ function getCtx(): AudioContext | null {
       (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
     if (!Ctor) return null;
     ctx = new Ctor();
+    // pointerdown fires before click, so the resume promise has time to settle
+    // before any sound is scheduled in the click handler.
+    const tryResume = () => { if (ctx && ctx.state !== "running") void ctx.resume(); };
+    window.addEventListener("pointerdown", tryResume, { capture: true, passive: true });
+    window.addEventListener("keydown", tryResume, { capture: true, passive: true });
   }
   if (ctx.state === "suspended") void ctx.resume();
   return ctx;

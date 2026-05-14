@@ -1,41 +1,52 @@
 # Yokai Dungeon
 
-Yokai Dungeon is a small browser game that turns an Anki `.apkg` deck into a dungeon run. Each flashcard becomes an enemy encounter: reveal the answer, judge yourself, and defeat yokai as you move through the deck.
+A browser game that turns an Anki `.apkg` deck into a dungeon run. Each flashcard is an enemy encounter — reveal the answer, judge yourself honestly, and cut down yokai as you advance through the deck.
 
-Live site:
+**Live:** https://schmidtenoah.github.io/Anki-Webgame/
 
-https://schmidtenoah.github.io/Anki-Webgame/
+---
+
+## How to Play
+
+1. In Anki, export your deck: **File → Export**, select **Anki Deck Package (.apkg)**, and make sure **Include Media** is checked — otherwise any images in your cards won't show up.
+2. Drop the `.apkg` file onto the upload screen.
+3. For each card: read the question, hit **Draw blade · Reveal**, then judge yourself — **Hit** if you knew it, **Miss** if you didn't.
+4. A correct answer slashes the yokai and moves you to the next floor. A wrong answer costs a life (you have three).
+5. Clear every card to win. Lose all lives and the run ends.
+
+Use the toggle in the top-right corner to switch between light and dark mode.
+
+---
 
 ## What It Does
 
-- Loads Anki `.apkg` decks directly in the browser.
-- Extracts cards from the Anki SQLite collection.
-- Displays question and answer HTML.
-- Turns each card into a battle encounter.
-- Plays lightweight synthesized sound effects with the Web Audio API.
-- Supports light and dark theme switching.
-- Deploys as a static Vite app on GitHub Pages.
+- Loads Anki `.apkg` decks directly in the browser — no account, no upload.
+- Parses the Anki SQLite collection with sql.js.
+- Renders question and answer HTML from the deck.
+- Synthesized sound effects via the Web Audio API (no audio files).
+- Light and dark theme.
+- Static Vite app deployed on GitHub Pages.
 
-## Privacy And Security
+---
 
-Yokai Dungeon is local-first. Deck files are processed in the user's browser and are not uploaded to a server by this app.
+## Privacy and Security
 
-Security measures in place:
+Everything runs locally. Your deck never leaves your browser.
 
-- No backend server, database, API, or account system.
-- No network upload path for user decks.
-- No `fetch`, WebSocket, beacon, or similar code path for sending card data out.
+- No backend, server, database, or account system.
+- No network path for sending card data anywhere.
 - Anki card HTML is sanitized with DOMPurify before rendering.
-- Dangerous card tags such as `script`, `iframe`, `object`, `embed`, `svg`, `video`, and `audio` are blocked.
-- Only `.apkg` files are accepted through the upload UI.
-- File size and extracted content limits are enforced to reduce browser-freeze risk from oversized decks.
-- Deck media is served through temporary browser object URLs and cleaned up when a new deck is loaded.
-- `npm audit` currently reports `0 vulnerabilities`.
+- Dangerous tags (`script`, `iframe`, `object`, `embed`, `svg`, `video`, `audio`) are blocked.
+- Only `.apkg` files accepted through the upload UI.
+- File size and content limits guard against browser freezes from oversized decks.
+- Deck media is served through temporary object URLs and cleaned up when a new deck loads.
+- `npm audit` reports `0 vulnerabilities`.
+
+---
 
 ## Tech Stack
 
-- React
-- TypeScript
+- React + TypeScript
 - Vite
 - Tailwind CSS
 - sql.js
@@ -43,43 +54,29 @@ Security measures in place:
 - DOMPurify
 - fzstd
 
-## Local Development
+---
 
-Install dependencies:
+## Local Development
 
 ```bash
 npm install
-```
-
-Run the development server:
-
-```bash
 npm run dev
 ```
 
-Build for production:
-
 ```bash
-npm run build
+npm run build    # production build
+npm run preview  # preview the build
 ```
 
-Preview the production build:
+The Vite base path is set to `/Anki-Webgame/` for GitHub Pages. The deployment workflow builds and publishes `dist` via GitHub Actions.
 
-```bash
-npm run preview
-```
+---
 
-## GitHub Pages Deployment
+## A Note on Culture
 
-This repo is configured for GitHub Pages deployment through GitHub Actions.
+I'm not Japanese — I built this out of genuine interest in the Japanese language and appreciation for its folklore and aesthetics. If anything here feels inaccurate or disrespectful, please open an issue or reach out. I'd rather fix it than get it wrong.
 
-The Vite base path is set to:
-
-```ts
-base: "/Anki-Webgame/"
-```
-
-The deployment workflow builds the app and publishes the `dist` folder to GitHub Pages.
+---
 
 ## License
 
