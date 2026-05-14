@@ -27,8 +27,8 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
   --color-shu: var(--shu);
-  --font-display: var(--font-display);
-  --font-body: var(--font-body);
+  --font-display: 'Noto Serif JP', ui-serif, Georgia, serif;
+  --font-body: 'Noto Serif JP', ui-serif, Georgia, serif;
 }
 
 :root {
@@ -60,7 +60,7 @@
   --muted-foreground: #c0b8ae;
   --accent: #8b1a10;
   --accent-foreground: #f5f1eb;
-  --destructive: oklch(0.5 0.2 28);
+  --destructive: #b91c1c;
   --destructive-foreground: #f5f1eb;
   --border: rgba(30, 26, 20, 0.10);
   --input: rgba(30, 26, 20, 0.08);
@@ -72,6 +72,7 @@
 
 .dark {
   /* Dark mode (Sumi-e — ink) */
+  --shu: #8b1a10;
   --background: #0d0b09;
   --foreground: #c8bfb4;
   --fg-dim: #4a403a;
@@ -94,7 +95,7 @@
   --muted-foreground: #4a403a;
   --accent: #8b1a10;
   --accent-foreground: #f5f1eb;
-  --destructive: oklch(0.5 0.2 28);
+  --destructive: #b91c1c;
   --destructive-foreground: #f5f1eb;
   --border: rgba(255, 255, 255, 0.07);
   --input: rgba(255, 255, 255, 0.05);
