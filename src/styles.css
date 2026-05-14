@@ -215,47 +215,57 @@
   .animate-shake { animation: shake 0.45s ease-in-out; }
 
   /* ── Sword slash ── */
-  .animate-slash { animation: slash-container 0.98s linear forwards; }
+  .animate-slash { animation: slash-container 0.96s linear forwards; }
   .slash-mark {
-    filter: drop-shadow(0 0 10px var(--shu));
+    filter: drop-shadow(0 0 10px var(--shu)) drop-shadow(0 0 4px rgba(255,255,255,0.45));
   }
   .slash-mark::before,
   .slash-mark::after {
     content: "";
     position: absolute;
-    left: -26%;
-    top: 50%;
-    width: 152%;
-    height: 14px;
-    border-radius: 999px;
-    background:
-      linear-gradient(90deg, transparent 0%, rgba(245,241,235,0.15) 18%, rgba(245,241,235,0.96) 46%, var(--shu) 54%, transparent 82%),
-      linear-gradient(90deg, transparent 0%, rgba(139,26,16,0.12) 30%, rgba(139,26,16,0.88) 52%, transparent 74%);
-    box-shadow: 0 0 16px rgba(139, 26, 16, 0.42);
+    left: -30%;
+    width: 160%;
+    height: 3px;
+    /* Sharp pointed tips — elongated eye/blade shape */
+    clip-path: polygon(0% 50%, 1.2% 0%, 98.8% 0%, 100% 50%, 98.8% 100%, 1.2% 100%);
+    background: linear-gradient(90deg,
+      transparent 0%,
+      rgba(255,255,255,0.12) 8%,
+      rgba(255,255,255,0.82) 28%,
+      #ffffff 46%,
+      rgba(215,225,245,0.96) 54%,
+      rgba(255,255,255,0.82) 72%,
+      rgba(255,255,255,0.12) 92%,
+      transparent 100%
+    );
     opacity: 0;
     transform-origin: center;
   }
+  /* First slash — slightly above centre so the two don't form a perfect X */
   .slash-mark::before {
-    animation: slash-down-right 0.46s cubic-bezier(0.14, 0.74, 0.18, 1) forwards;
+    top: 46%;
+    animation: slash-one 0.36s cubic-bezier(0.05, 0.75, 0.2, 1) forwards;
   }
+  /* Second slash — slightly below centre */
   .slash-mark::after {
-    animation: slash-down-left 0.46s cubic-bezier(0.14, 0.74, 0.18, 1) 0.24s forwards;
+    top: 54%;
+    animation: slash-two 0.36s cubic-bezier(0.05, 0.75, 0.2, 1) 0.28s forwards;
   }
   @keyframes slash-container {
     0%, 86% { opacity: 1; }
     100%    { opacity: 0; }
   }
-  @keyframes slash-down-right {
-    0%   { opacity: 0; transform: translate(-34%, -58%) rotate(42deg) scaleX(0.2); }
-    10%  { opacity: 1; }
-    48%  { opacity: 1; transform: translate(0, 0) rotate(42deg) scaleX(1); }
-    100% { opacity: 0; transform: translate(34%, 58%) rotate(42deg) scaleX(1.08); }
+  @keyframes slash-one {
+    0%   { opacity: 0; transform: translate(-40%, -600%) rotate(38deg) scaleX(0.08); }
+    6%   { opacity: 1; }
+    40%  { opacity: 1; transform: translate(0%, 0%) rotate(38deg) scaleX(1); }
+    100% { opacity: 0; transform: translate(40%, 600%) rotate(38deg) scaleX(1.06); }
   }
-  @keyframes slash-down-left {
-    0%   { opacity: 0; transform: translate(34%, -58%) rotate(-42deg) scaleX(0.2); }
-    10%  { opacity: 1; }
-    48%  { opacity: 1; transform: translate(0, 0) rotate(-42deg) scaleX(1); }
-    100% { opacity: 0; transform: translate(-34%, 58%) rotate(-42deg) scaleX(1.08); }
+  @keyframes slash-two {
+    0%   { opacity: 0; transform: translate(40%, -600%) rotate(-38deg) scaleX(0.08); }
+    6%   { opacity: 1; }
+    40%  { opacity: 1; transform: translate(0%, 0%) rotate(-38deg) scaleX(1); }
+    100% { opacity: 0; transform: translate(-40%, 600%) rotate(-38deg) scaleX(1.06); }
   }
 
   /* ── Damage vignette ── */

@@ -86,7 +86,8 @@ export function BattleScreen({ cards, dark, onToggleTheme, onGameOver, onVictory
 
     if (correct) {
       scrollToTop();
-      sfx.hit();
+      sfx.slash();
+      setTimeout(() => sfx.slash(), 280);
       setSlashing(true);
       setTimeout(() => setDying(true), 720);
       setTimeout(() => setSlashing(false), 980);

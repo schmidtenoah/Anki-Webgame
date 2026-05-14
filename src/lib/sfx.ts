@@ -117,22 +117,14 @@ export const sfx = {
     ], 0.13);
   },
 
-  // Kill hit: crisp whoosh sweep + metallic ping + resonant ring.
-  hit() {
-    // Two softer blade passes: "slash, slash" without a piercing peak.
-    playNoise(0.00, 0.22, 0.46, 0.095, { highpass: 420, lowpass: 2400 });
-    playNoise(0.24, 0.22, 0.42, 0.09, { highpass: 520, lowpass: 2600 });
-
+  // Single katana slash whoosh — called once per visible slash strike.
+  slash() {
+    playNoise(0, 0.16, 0.62, 0.11, { highpass: 650, lowpass: 3000 });
     play([
-      // First blade draw.
-      { freq: 760, time: 0.00, dur: 0.11, type: "triangle", gain: 0.30, sweepTo: 190 },
-      // Second visible cut lands a little later.
-      { freq: 920, time: 0.24, dur: 0.12, type: "triangle", gain: 0.32, sweepTo: 170 },
-      // Short, low ring instead of a piercing ping.
-      { freq: 980, time: 0.34, dur: 0.14, type: "sine",     gain: 0.16, sweepTo: 620 },
-      // Low resonant body thump.
-      { freq: 150, time: 0.40, dur: 0.22, type: "sine",     gain: 0.34, sweepTo: 70 },
-    ], 0.09);
+      // Blade zing: high-freq sweep downward (metallic edge resonance).
+      { freq: 980, time: 0.006, dur: 0.10, type: "triangle", gain: 0.24, sweepTo: 200 },
+      { freq: 2300, time: 0.006, dur: 0.055, type: "sine", gain: 0.07, sweepTo: 1400 },
+    ], 0.085);
   },
 
   // Damage thud: low bass hit + dissonant buzz to signal pain.
