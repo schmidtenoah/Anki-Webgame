@@ -88,14 +88,14 @@ export function BattleScreen({ cards, dark, onToggleTheme, onGameOver, onVictory
       scrollToTop();
       sfx.hit();
       setSlashing(true);
-      setTimeout(() => setDying(true), 520);
-      setTimeout(() => setSlashing(false), 1050);
+      setTimeout(() => setDying(true), 720);
+      setTimeout(() => setSlashing(false), 980);
       setTimeout(() => {
         setDying(false);
         if (index + 1 >= queue.length) { finish("victory", queue.length); return; }
         setIndex((i) => i + 1);
         setPhase("question");
-      }, 1300);
+      }, 1220);
     } else {
       sfx.miss();
       setDamaged(true);

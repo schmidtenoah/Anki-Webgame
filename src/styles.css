@@ -215,14 +215,7 @@
   .animate-shake { animation: shake 0.45s ease-in-out; }
 
   /* ── Sword slash ── */
-  @keyframes slash {
-    0%   { transform: translate(-130%, 126%) rotate(-30deg) scaleX(0.82); opacity: 0; }
-    12%  { opacity: 1; transform: translate(-92%, 92%) rotate(-30deg) scaleX(0.98); }
-    46%  { opacity: 0.95; transform: translate(8%, -8%) rotate(-30deg) scaleX(1.06); }
-    74%  { opacity: 0.78; transform: translate(84%, -84%) rotate(-30deg) scaleX(1.12); }
-    100% { transform: translate(150%, -150%) rotate(-30deg) scaleX(1.18); opacity: 0; }
-  }
-  .animate-slash { animation: slash 1.05s cubic-bezier(0.18, 0.72, 0.24, 1) forwards; }
+  .animate-slash { animation: slash-container 0.98s linear forwards; }
   .slash-mark {
     filter: drop-shadow(0 0 10px var(--shu));
   }
@@ -230,22 +223,39 @@
   .slash-mark::after {
     content: "";
     position: absolute;
-    inset: 45% -18%;
+    left: -26%;
+    top: 50%;
+    width: 152%;
+    height: 14px;
     border-radius: 999px;
     background:
-      linear-gradient(90deg, transparent 0%, rgba(245,241,235,0.25) 20%, rgba(245,241,235,0.95) 48%, var(--shu) 56%, transparent 78%),
-      linear-gradient(90deg, transparent 0%, rgba(139,26,16,0.1) 32%, rgba(139,26,16,0.85) 52%, transparent 72%);
+      linear-gradient(90deg, transparent 0%, rgba(245,241,235,0.15) 18%, rgba(245,241,235,0.96) 46%, var(--shu) 54%, transparent 82%),
+      linear-gradient(90deg, transparent 0%, rgba(139,26,16,0.12) 30%, rgba(139,26,16,0.88) 52%, transparent 74%);
     box-shadow: 0 0 16px rgba(139, 26, 16, 0.42);
+    opacity: 0;
+    transform-origin: center;
+  }
+  .slash-mark::before {
+    animation: slash-down-right 0.46s cubic-bezier(0.14, 0.74, 0.18, 1) forwards;
   }
   .slash-mark::after {
-    transform: translateY(1.9rem) rotate(8deg);
-    opacity: 0.78;
-    animation: slash-second 1.05s cubic-bezier(0.18, 0.72, 0.24, 1) forwards;
+    animation: slash-down-left 0.46s cubic-bezier(0.14, 0.74, 0.18, 1) 0.24s forwards;
   }
-  @keyframes slash-second {
-    0%, 17% { opacity: 0; }
-    30%    { opacity: 0.82; }
-    100%   { opacity: 0; }
+  @keyframes slash-container {
+    0%, 86% { opacity: 1; }
+    100%    { opacity: 0; }
+  }
+  @keyframes slash-down-right {
+    0%   { opacity: 0; transform: translate(-34%, -58%) rotate(42deg) scaleX(0.2); }
+    10%  { opacity: 1; }
+    48%  { opacity: 1; transform: translate(0, 0) rotate(42deg) scaleX(1); }
+    100% { opacity: 0; transform: translate(34%, 58%) rotate(42deg) scaleX(1.08); }
+  }
+  @keyframes slash-down-left {
+    0%   { opacity: 0; transform: translate(34%, -58%) rotate(-42deg) scaleX(0.2); }
+    10%  { opacity: 1; }
+    48%  { opacity: 1; transform: translate(0, 0) rotate(-42deg) scaleX(1); }
+    100% { opacity: 0; transform: translate(-34%, 58%) rotate(-42deg) scaleX(1.08); }
   }
 
   /* ── Damage vignette ── */
