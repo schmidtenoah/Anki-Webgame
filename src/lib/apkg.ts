@@ -11,6 +11,14 @@ export interface Flashcard {
 }
 
 let SQL: Awaited<ReturnType<typeof initSqlJs>> | null = null;
+let activeObjectUrls: string[] = [];
+const MAX_COLLECTION_BYTES = 200 * 1024 * 1024;
+const MAX_MEDIA_BYTES = 12 * 1024 * 1024;
+
+export function clearApkgObjectUrls() {
+  activeObjectUrls.forEach((url) => URL.revokeObjectURL(url));
+  activeObjectUrls = [];
+}
 
 async function getSql() {
   if (SQL) return SQL;
@@ -173,15 +181,24 @@ function decodeMediaEntries(bytes: Uint8Array): Record<string, string> | null {
 
 async function readCollectionBytes(zip: JSZip): Promise<Uint8Array> {
   const b = zip.file("collection.anki21b");
+  let bytes: Uint8Array;
   if (b) {
     const raw = await b.async("uint8array");
-    return decompressIfZstd(raw);
+    bytes = decompressIfZstd(raw);
+  } else {
+    const a21 = zip.file("collection.anki21");
+    if (a21) bytes = await a21.async("uint8array");
+    else {
+      const a2 = zip.file("collection.anki2");
+      if (a2) bytes = await a2.async("uint8array");
+      else throw new Error("No Anki collection was found in this file.");
+    }
   }
-  const a21 = zip.file("collection.anki21");
-  if (a21) return a21.async("uint8array");
-  const a2 = zip.file("collection.anki2");
-  if (a2) return a2.async("uint8array");
-  throw new Error("No Anki collection was found in this file.");
+
+  if (bytes.byteLength > MAX_COLLECTION_BYTES) {
+    throw new Error("Deck database is too large to open safely in the browser.");
+  }
+  return bytes;
 }
 
 async function buildMediaMap(zip: JSZip): Promise<Map<string, string>> {
@@ -211,16 +228,18 @@ async function buildMediaMap(zip: JSZip): Promise<Map<string, string>> {
       const entry = zip.file(key);
       if (!entry) return;
       const bytes = decompressIfZstd(await entry.async("uint8array"));
+      if (bytes.byteLength > MAX_MEDIA_BYTES) return;
       const ext = originalName.split(".").pop()?.toLowerCase() ?? "";
       const mime =
         ext === "png" ? "image/png" :
         ext === "jpg" || ext === "jpeg" ? "image/jpeg" :
         ext === "gif" ? "image/gif" :
         ext === "webp" ? "image/webp" :
-        ext === "svg" ? "image/svg+xml" :
-        "application/octet-stream";
+        null;
+      if (!mime) return;
       const typed = new Blob([new Uint8Array(bytes).buffer], { type: mime });
       const url = URL.createObjectURL(typed);
+      activeObjectUrls.push(url);
       map.set(originalName, url);
       // also map basename in case src has a path
       const basename = originalName.split("/").pop()!;
@@ -232,6 +251,7 @@ async function buildMediaMap(zip: JSZip): Promise<Map<string, string>> {
 }
 
 export async function parseApkg(file: File): Promise<Flashcard[]> {
+  clearApkgObjectUrls();
   const zip = await JSZip.loadAsync(file);
   const [dbBytes, mediaMap] = await Promise.all([
     readCollectionBytes(zip),

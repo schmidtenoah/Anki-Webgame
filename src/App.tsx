@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { Flashcard } from "./lib/apkg";
+import { clearApkgObjectUrls, type Flashcard } from "./lib/apkg";
 import { UploadScreen } from "./components/game/UploadScreen";
 import { BattleScreen } from "./components/game/BattleScreen";
 import { ResultScreen } from "./components/game/ResultScreen";
@@ -14,6 +14,7 @@ export function App() {
   const { dark, toggle } = useTheme();
 
   const restart = () => {
+    clearApkgObjectUrls();
     setStage("upload");
     setCards([]);
     setDefeated(0);

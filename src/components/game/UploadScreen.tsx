@@ -3,6 +3,8 @@ import { parseApkg, type Flashcard } from "@/lib/apkg";
 import { sfx } from "@/lib/sfx";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
+const MAX_APKG_SIZE = 100 * 1024 * 1024;
+
 interface Props {
   dark: boolean;
   onToggleTheme: () => void;
@@ -17,6 +19,14 @@ export function UploadScreen({ dark, onToggleTheme, onLoaded }: Props) {
   const handleFile = useCallback(
     async (file: File) => {
       setError(null);
+      if (!file.name.toLowerCase().endsWith(".apkg")) {
+        setError("Please choose an .apkg deck file.");
+        return;
+      }
+      if (file.size > MAX_APKG_SIZE) {
+        setError("Deck is too large. Please use an .apkg file under 100 MB.");
+        return;
+      }
       setLoading(true);
       sfx.prime();
       sfx.click();

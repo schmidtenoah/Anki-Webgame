@@ -119,18 +119,19 @@ export const sfx = {
 
   // Kill hit: crisp whoosh sweep + metallic ping + resonant ring.
   hit() {
-    // Softened whoosh layer, kept below the sharp ear-fatiguing range.
-    playNoise(0, 0.24, 0.42, 0.08, { highpass: 420, lowpass: 1800 });
+    // Two softer blade passes: "slash, slash" without a piercing peak.
+    playNoise(0, 0.34, 0.40, 0.085, { highpass: 360, lowpass: 1800 });
+    playNoise(0.18, 0.30, 0.34, 0.075, { highpass: 520, lowpass: 2300 });
 
     play([
-      // Immediate impact transient so the sound lands with the slash frame.
-      { freq: 520, time: 0,    dur: 0.035, type: "triangle", gain: 0.35, sweepTo: 260 },
-      // Warm downward sweep for the blade impact.
-      { freq: 760, time: 0.01, dur: 0.17,  type: "triangle", gain: 0.34, sweepTo: 120 },
+      // First blade draw.
+      { freq: 620, time: 0.00, dur: 0.16, type: "triangle", gain: 0.24, sweepTo: 180 },
+      // Second visible cut lands a little later.
+      { freq: 860, time: 0.18, dur: 0.18, type: "triangle", gain: 0.28, sweepTo: 150 },
       // Short, low ring instead of a piercing ping.
-      { freq: 980, time: 0.02, dur: 0.14, type: "sine",     gain: 0.22, sweepTo: 620 },
+      { freq: 980, time: 0.24, dur: 0.16, type: "sine",     gain: 0.18, sweepTo: 620 },
       // Low resonant body thump.
-      { freq: 150, time: 0.04, dur: 0.20, type: "sine",     gain: 0.45, sweepTo: 70 },
+      { freq: 150, time: 0.30, dur: 0.24, type: "sine",     gain: 0.38, sweepTo: 70 },
     ], 0.09);
   },
 

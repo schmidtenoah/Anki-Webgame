@@ -216,12 +216,37 @@
 
   /* ── Sword slash ── */
   @keyframes slash {
-    0%   { transform: translate(-160%, 160%) rotate(-28deg) scaleX(0.85); opacity: 0; }
-    8%   { opacity: 1; transform: translate(-110%, 110%) rotate(-28deg) scaleX(1); }
-    68%  { opacity: 0.85; }
-    100% { transform: translate(200%, -200%) rotate(-28deg) scaleX(1.1); opacity: 0; }
+    0%   { transform: translate(-130%, 126%) rotate(-30deg) scaleX(0.82); opacity: 0; }
+    12%  { opacity: 1; transform: translate(-92%, 92%) rotate(-30deg) scaleX(0.98); }
+    46%  { opacity: 0.95; transform: translate(8%, -8%) rotate(-30deg) scaleX(1.06); }
+    74%  { opacity: 0.78; transform: translate(84%, -84%) rotate(-30deg) scaleX(1.12); }
+    100% { transform: translate(150%, -150%) rotate(-30deg) scaleX(1.18); opacity: 0; }
   }
-  .animate-slash { animation: slash 0.72s cubic-bezier(0.18, 0.72, 0.28, 1) forwards; }
+  .animate-slash { animation: slash 1.05s cubic-bezier(0.18, 0.72, 0.24, 1) forwards; }
+  .slash-mark {
+    filter: drop-shadow(0 0 10px var(--shu));
+  }
+  .slash-mark::before,
+  .slash-mark::after {
+    content: "";
+    position: absolute;
+    inset: 45% -18%;
+    border-radius: 999px;
+    background:
+      linear-gradient(90deg, transparent 0%, rgba(245,241,235,0.25) 20%, rgba(245,241,235,0.95) 48%, var(--shu) 56%, transparent 78%),
+      linear-gradient(90deg, transparent 0%, rgba(139,26,16,0.1) 32%, rgba(139,26,16,0.85) 52%, transparent 72%);
+    box-shadow: 0 0 16px rgba(139, 26, 16, 0.42);
+  }
+  .slash-mark::after {
+    transform: translateY(1.9rem) rotate(8deg);
+    opacity: 0.78;
+    animation: slash-second 1.05s cubic-bezier(0.18, 0.72, 0.24, 1) forwards;
+  }
+  @keyframes slash-second {
+    0%, 17% { opacity: 0; }
+    30%    { opacity: 0.82; }
+    100%   { opacity: 0; }
+  }
 
   /* ── Damage vignette ── */
   @keyframes damage-vignette {

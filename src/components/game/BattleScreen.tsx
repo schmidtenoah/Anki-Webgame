@@ -88,13 +88,14 @@ export function BattleScreen({ cards, dark, onToggleTheme, onGameOver, onVictory
       scrollToTop();
       sfx.hit();
       setSlashing(true);
-      setTimeout(() => { setSlashing(false); setDying(true); }, 280);
+      setTimeout(() => setDying(true), 520);
+      setTimeout(() => setSlashing(false), 1050);
       setTimeout(() => {
         setDying(false);
         if (index + 1 >= queue.length) { finish("victory", queue.length); return; }
         setIndex((i) => i + 1);
         setPhase("question");
-      }, 950);
+      }, 1300);
     } else {
       sfx.miss();
       setDamaged(true);
@@ -205,12 +206,7 @@ export function BattleScreen({ cards, dark, onToggleTheme, onGameOver, onVictory
             {slashing && (
               <span
                 aria-hidden
-                className="absolute inset-0 animate-slash"
-                style={{
-                  background:
-                    "linear-gradient(135deg, transparent 42%, var(--shu) 46%, rgba(245,241,235,0.9) 50%, var(--shu) 54%, transparent 58%)",
-                  filter: "drop-shadow(0 0 8px var(--shu))",
-                }}
+                className="absolute inset-0 slash-mark animate-slash"
               />
             )}
 
