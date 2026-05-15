@@ -1,9 +1,11 @@
 import { sfx } from "@/lib/sfx";
+import { SoundToggle } from "@/components/ui/SoundToggle";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
+import type { CSSProperties } from "react";
 
 interface Props {
   title: string;
-  kanji: string;
+  glyph: string;
   subtitle: string;
   detail?: string;
   primaryLabel: string;
@@ -13,11 +15,14 @@ interface Props {
   variant?: "victory" | "defeat";
   dark: boolean;
   onToggleTheme: () => void;
+  soundMuted: boolean;
+  onToggleSound: () => void;
+  accent: string;
 }
 
 export function ResultScreen({
   title,
-  kanji,
+  glyph,
   subtitle,
   detail,
   primaryLabel,
@@ -27,21 +32,28 @@ export function ResultScreen({
   variant = "victory",
   dark,
   onToggleTheme,
+  soundMuted,
+  onToggleSound,
+  accent,
 }: Props) {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-6 relative overflow-hidden">
+    <div
+      className="min-h-screen flex flex-col items-center justify-center p-6 relative overflow-hidden"
+      style={{ "--lore-accent": accent } as CSSProperties}
+    >
       {/* Toggle - top right */}
-      <div className="absolute top-5 right-5 z-20">
+      <div className="absolute top-5 right-5 z-20 flex items-center gap-2">
+        <SoundToggle muted={soundMuted} onToggle={onToggleSound} />
         <ThemeToggle dark={dark} onToggle={onToggleTheme} />
       </div>
 
-      {/* Massive BG kanji */}
+      {/* Massive BG glyph */}
       <div
         aria-hidden
         className="absolute inset-0 flex items-center justify-center vertical-jp font-display select-none pointer-events-none bg-kanji"
         style={{ fontSize: "28rem" }}
       >
-        {kanji}
+        {glyph}
       </div>
 
       <div className="card-surface relative p-10 max-w-lg w-full text-center animate-fade-in-soft">

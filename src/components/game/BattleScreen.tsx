@@ -1,22 +1,15 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import type { Flashcard } from "@/lib/apkg";
 import { sfx } from "@/lib/sfx";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
-
-const ENEMIES = [
-  { kanji: "鬼",   name: "Oni",        description: "Iron-club demons born from corrupt souls, tasked with staffing the underworld's torture chambers. During Setsubun, roasted soybeans are hurled to drive them from homes." },
-  { kanji: "天狗", name: "Tengu",      description: "Winged mountain spirits and master swordsmen said to have trained legendary warriors. Once feared as harbingers of war, they became fierce guardians of the peaks." },
-  { kanji: "河童", name: "Kappa",      description: "River creatures with a water-filled dish on their heads. Bowing can make one bow back, spill the water, and lose its strength. Dangerous to swimmers, but bound by strict honor." },
-  { kanji: "雪女", name: "Yuki-onna", description: "A pale woman who materialises in blizzards and breathes lethal cold. She sometimes spares those she finds beautiful, and legends tell of her living undetected as a mortal wife for years." },
-  { kanji: "木霊", name: "Kodama",     description: "Tree spirits dwelling in ancient forests, their presence said to explain the echoes heard in mountain passes. Felling a tree that houses one was believed to bring devastating misfortune." },
-  { kanji: "狐",   name: "Kitsune",   description: "Fox spirits that grow wiser and more powerful with age, sometimes gaining up to nine tails. Some serve Inari as messengers, and many tales give them the power to take human form." },
-  { kanji: "狸",   name: "Tanuki",    description: "Magical raccoon dogs famed for shapeshifting and their jolly nature. Skilled tricksters rather than malicious ones, they are symbols of good fortune throughout Japan." },
-  { kanji: "絡新婦", name: "Jorogumo", description: "A spider that, after four hundred years, gains the power to transform into a beautiful woman. She lures men with the sound of a biwa before binding them in silk." },
-  { kanji: "塗壁", name: "Nurikabe",  description: "An invisible wall that blocks travellers on lonely roads at night, impossible to walk around or climb. Folklore holds that striking its very base with a stick causes it to vanish." },
-  { kanji: "垢嘗", name: "Akaname",   description: "A grime-licker that slips into neglected bathrooms at night to feed on built-up filth. Its existence in folklore served as a simple warning: keep your bathroom clean." },
-  { kanji: "鎌鼬", name: "Kamaitachi", description: "Weasel-like yokai riding sudden whirlwinds and cutting people with sickle-like claws. In one three-part tradition, one knocks you down, one cuts, and one seals the wound." },
-  { kanji: "海坊主", name: "Umibozu", description: "A vast dark shape that rises from calm seas to capsize ships. Believed to be the spirit of a drowned monk; sailors hoped that throwing it a barrel might buy enough time to flee." },
-];
+import { SoundToggle } from "@/components/ui/SoundToggle";
+import {
+  getDungeonLives,
+  getNextLivesAfterMiss,
+  hasInfiniteLives,
+  type DungeonConfig,
+  type FolkloreTheme,
+} from "@/lib/gameConfig";
 
 type Phase = "question" | "reveal" | "resolved";
 
@@ -24,14 +17,28 @@ interface Props {
   cards: Flashcard[];
   dark: boolean;
   onToggleTheme: () => void;
+  soundMuted: boolean;
+  onToggleSound: () => void;
+  folklore: FolkloreTheme;
+  dungeon: DungeonConfig;
   onGameOver: (defeated: number) => void;
   onVictory: () => void;
 }
 
-export function BattleScreen({ cards, dark, onToggleTheme, onGameOver, onVictory }: Props) {
+export function BattleScreen({
+  cards,
+  dark,
+  onToggleTheme,
+  soundMuted,
+  onToggleSound,
+  folklore,
+  dungeon,
+  onGameOver,
+  onVictory,
+}: Props) {
   const queue = useMemo(() => [...cards].sort(() => Math.random() - 0.5), [cards]);
   const [index, setIndex] = useState(0);
-  const [lives, setLives] = useState(3);
+  const [lives, setLives] = useState<number | null>(() => getDungeonLives(dungeon));
   const [phase, setPhase] = useState<Phase>("question");
   const [slashing, setSlashing] = useState(false);
   const [dying, setDying] = useState(false);
@@ -40,8 +47,8 @@ export function BattleScreen({ cards, dark, onToggleTheme, onGameOver, onVictory
   const topRef = useRef<HTMLDivElement>(null);
 
   const card = queue[index];
-  const enemy = ENEMIES[index % ENEMIES.length];
-  const glyphLength = Array.from(enemy.kanji).length;
+  const enemy = folklore.enemies[index % folklore.enemies.length];
+  const glyphLength = Array.from(enemy.glyph).length;
   const glyphFontSize =
     glyphLength === 1 ? "9rem" :
     glyphLength === 2 ? "5.5rem" :
@@ -101,9 +108,9 @@ export function BattleScreen({ cards, dark, onToggleTheme, onGameOver, onVictory
       sfx.miss();
       setDamaged(true);
       setTimeout(() => setDamaged(false), 750);
-      const nextLives = lives - 1;
+      const nextLives = getNextLivesAfterMiss(dungeon, lives);
       setLives(nextLives);
-      if (nextLives <= 0) { setTimeout(() => finish("defeat", index), 400); return; }
+      if (nextLives !== null && nextLives <= 0) { setTimeout(() => finish("defeat", index), 400); return; }
       setTimeout(() => { setIndex((i) => (i + 1) % queue.length); setPhase("question"); }, 750);
     }
   };
@@ -114,6 +121,7 @@ export function BattleScreen({ cards, dark, onToggleTheme, onGameOver, onVictory
       className={`min-h-screen flex flex-col p-5 md:p-8 relative overflow-hidden transition-opacity duration-700 ${
         exiting ? "opacity-0" : "opacity-100"
       }`}
+      style={{ "--lore-accent": folklore.accent } as CSSProperties}
     >
       {/* Damage vignette */}
       {damaged && (
@@ -127,16 +135,17 @@ export function BattleScreen({ cards, dark, onToggleTheme, onGameOver, onVictory
       {/* HUD */}
       <header className="flex items-center justify-between mb-8 relative z-10">
         <div className="flex items-center gap-3">
-          <span className="seal h-9 w-9 text-sm">鬼</span>
+          <span className="seal h-9 w-9 text-sm">{folklore.sealGlyph}</span>
           <div>
-            <p className="text-[0.5rem] uppercase tracking-[0.4em] text-fg-dim">Floor</p>
+            <p className="text-[0.5rem] uppercase tracking-[0.4em] text-fg-dim">{dungeon.label}</p>
             <p className="font-display font-light text-xl leading-none">
               {String(floor).padStart(2, "0")}{" "}
               <span className="text-fg-dim text-sm">/ {queue.length}</span>
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
+          <SoundToggle muted={soundMuted} onToggle={onToggleSound} />
           <ThemeToggle dark={dark} onToggle={onToggleTheme} />
           <button
             onClick={giveUp}
@@ -148,18 +157,22 @@ export function BattleScreen({ cards, dark, onToggleTheme, onGameOver, onVictory
           >
             Give up
           </button>
-          <div className="flex items-center gap-2" aria-label={`${lives} lives`}>
-            {Array.from({ length: 3 }).map((_, i) => (
-              <span
-                key={i}
-                className="h-3 w-3 rotate-45 inline-block transition-all duration-300"
-                style={{
-                  background: i < lives ? "var(--shu)" : "transparent",
-                  border: i < lives ? "none" : "1px solid var(--card-border)",
-                }}
-              />
-            ))}
-          </div>
+          {hasInfiniteLives(dungeon) ? (
+            <div className="font-display text-lg leading-none" aria-label="Infinite lives">∞</div>
+          ) : (
+            <div className="flex items-center gap-2" aria-label={`${lives ?? 0} lives`}>
+              {Array.from({ length: dungeon.lives ?? 0 }).map((_, i) => (
+                <span
+                  key={i}
+                  className="h-3 w-3 rotate-45 inline-block transition-all duration-300"
+                  style={{
+                    background: i < (lives ?? 0) ? "var(--lore-accent, var(--shu))" : "transparent",
+                    border: i < (lives ?? 0) ? "none" : "1px solid var(--card-border)",
+                  }}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </header>
 
@@ -176,7 +189,7 @@ export function BattleScreen({ cards, dark, onToggleTheme, onGameOver, onVictory
             className="absolute inset-0 -z-10 blur-3xl opacity-40"
             style={{
               background:
-                "radial-gradient(circle, rgba(139,26,16,0.25) 0%, transparent 70%)",
+                "radial-gradient(circle, color-mix(in srgb, var(--lore-accent, var(--shu)) 28%, transparent) 0%, transparent 70%)",
             }}
           />
 
@@ -190,7 +203,7 @@ export function BattleScreen({ cards, dark, onToggleTheme, onGameOver, onVictory
             <div className="enemy-line" />
             <div className="h-2" />
 
-            {/* Kanji + folklore tooltip */}
+            {/* Glyph + folklore tooltip */}
             <div
               className="enemy-tooltip-wrapper"
               tabIndex={0}
@@ -205,7 +218,7 @@ export function BattleScreen({ cards, dark, onToggleTheme, onGameOver, onVictory
                   textShadow: "0 0 40px rgba(139, 26, 16, 0.2)",
                 }}
               >
-                {enemy.kanji}
+                {enemy.glyph}
               </span>
               <div id={`enemy-tooltip-${index}`} className="enemy-tooltip" role="tooltip">
                 <p className="enemy-tooltip-name">{enemy.name}</p>
@@ -291,9 +304,9 @@ export function BattleScreen({ cards, dark, onToggleTheme, onGameOver, onVictory
                 onClick={() => judge(true)}
                 className="ui-button px-6 py-2.5 font-display font-light tracking-widest text-[0.55rem] uppercase"
                 style={{
-                  background: "var(--shu)",
+                  background: "var(--lore-accent, var(--shu))",
                   color: "#f5f1eb",
-                  boxShadow: "0 2px 8px rgba(139,26,16,0.4)",
+                  boxShadow: "0 2px 8px color-mix(in srgb, var(--lore-accent, var(--shu)) 40%, transparent)",
                 }}
               >
                 Hit

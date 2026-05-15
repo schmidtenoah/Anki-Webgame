@@ -36,6 +36,7 @@
 
   /* Shu (vermilion) — same in both modes */
   --shu: #8b1a10;
+  --lore-accent: #8b1a10;
 
   /* Light mode (Ma — washi paper) */
   --background: #f5f1eb;
@@ -187,21 +188,21 @@
   .ui-button:hover {
     transform: translateY(-1px) scale(1.035);
     box-shadow:
-      0 0 0 1px rgba(139, 26, 16, 0.14),
-      0 0 18px rgba(139, 26, 16, 0.22);
+      0 0 0 1px color-mix(in srgb, var(--lore-accent, var(--shu)) 18%, transparent),
+      0 0 18px color-mix(in srgb, var(--lore-accent, var(--shu)) 24%, transparent);
     filter: brightness(1.06);
   }
   .ui-button:active {
     transform: translateY(0) scale(0.985);
   }
   .ui-button:focus-visible {
-    outline: 2px solid var(--ring);
+    outline: 2px solid var(--lore-accent, var(--ring));
     outline-offset: 3px;
   }
   .subtle-button:hover {
     box-shadow:
-      0 0 0 1px rgba(139, 26, 16, 0.10),
-      0 0 12px rgba(139, 26, 16, 0.14);
+      0 0 0 1px color-mix(in srgb, var(--lore-accent, var(--shu)) 12%, transparent),
+      0 0 12px color-mix(in srgb, var(--lore-accent, var(--shu)) 16%, transparent);
   }
   .danger-button {
     background: rgba(139, 26, 16, 0.08);
@@ -210,17 +211,30 @@
     background: rgba(139, 26, 16, 0.16);
     border-color: rgba(139, 26, 16, 0.62) !important;
   }
+  .option-button {
+    min-height: 5.25rem;
+    border: 1px solid var(--card-border);
+    border-radius: 3px;
+    color: var(--fg-mid);
+    background: color-mix(in srgb, var(--card) 74%, transparent);
+  }
+  .option-button[data-selected="true"] {
+    border-color: color-mix(in srgb, var(--lore-accent, var(--shu)) 64%, transparent);
+    color: var(--foreground);
+    background: color-mix(in srgb, var(--lore-accent, var(--shu)) 10%, var(--card));
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--lore-accent, var(--shu)) 18%, transparent);
+  }
 
   /* Seal */
   .seal {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    background-color: var(--shu);
+    background-color: var(--lore-accent, var(--shu));
     color: #f5f1eb;
     font-family: var(--font-display);
     border-radius: 3px;
-    box-shadow: 0 2px 8px rgba(139, 26, 16, 0.4);
+    box-shadow: 0 2px 8px color-mix(in srgb, var(--lore-accent, var(--shu)) 40%, transparent);
     flex-shrink: 0;
   }
 
@@ -358,7 +372,7 @@
     transition-delay: 320ms;
   }
   .enemy-tooltip-wrapper:focus-visible {
-    filter: drop-shadow(0 0 18px rgba(139, 26, 16, 0.26));
+    filter: drop-shadow(0 0 18px color-mix(in srgb, var(--lore-accent, var(--shu)) 28%, transparent));
   }
   .enemy-tooltip-name {
     font-size: 0.45rem;

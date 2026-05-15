@@ -14,6 +14,8 @@ let SQL: Awaited<ReturnType<typeof initSqlJs>> | null = null;
 let activeObjectUrls: string[] = [];
 const MAX_COLLECTION_BYTES = 200 * 1024 * 1024;
 const MAX_MEDIA_BYTES = 12 * 1024 * 1024;
+const MAX_MEDIA_FILES = 250;
+const MAX_TOTAL_MEDIA_BYTES = 64 * 1024 * 1024;
 
 export function clearApkgObjectUrls() {
   activeObjectUrls.forEach((url) => URL.revokeObjectURL(url));
@@ -223,29 +225,31 @@ async function buildMediaMap(zip: JSZip): Promise<Map<string, string>> {
     mapping = decodeMediaEntries(raw) ?? {};
   }
 
-  await Promise.all(
-    Object.entries(mapping).map(async ([key, originalName]) => {
-      const entry = zip.file(key);
-      if (!entry) return;
-      const bytes = decompressIfZstd(await entry.async("uint8array"));
-      if (bytes.byteLength > MAX_MEDIA_BYTES) return;
-      const ext = originalName.split(".").pop()?.toLowerCase() ?? "";
-      const mime =
-        ext === "png" ? "image/png" :
-        ext === "jpg" || ext === "jpeg" ? "image/jpeg" :
-        ext === "gif" ? "image/gif" :
-        ext === "webp" ? "image/webp" :
-        null;
-      if (!mime) return;
-      const typed = new Blob([new Uint8Array(bytes).buffer], { type: mime });
-      const url = URL.createObjectURL(typed);
-      activeObjectUrls.push(url);
-      map.set(originalName, url);
-      // also map basename in case src has a path
-      const basename = originalName.split("/").pop()!;
-      if (basename !== originalName) map.set(basename, url);
-    }),
-  );
+  let totalMediaBytes = 0;
+  for (const [key, originalName] of Object.entries(mapping).slice(0, MAX_MEDIA_FILES)) {
+    const entry = zip.file(key);
+    if (!entry) continue;
+    const bytes = decompressIfZstd(await entry.async("uint8array"));
+    if (bytes.byteLength > MAX_MEDIA_BYTES) continue;
+    if (totalMediaBytes + bytes.byteLength > MAX_TOTAL_MEDIA_BYTES) break;
+    totalMediaBytes += bytes.byteLength;
+
+    const ext = originalName.split(".").pop()?.toLowerCase() ?? "";
+    const mime =
+      ext === "png" ? "image/png" :
+      ext === "jpg" || ext === "jpeg" ? "image/jpeg" :
+      ext === "gif" ? "image/gif" :
+      ext === "webp" ? "image/webp" :
+      null;
+    if (!mime) continue;
+    const typed = new Blob([new Uint8Array(bytes).buffer], { type: mime });
+    const url = URL.createObjectURL(typed);
+    activeObjectUrls.push(url);
+    map.set(originalName, url);
+    // Also map basename in case src has a path.
+    const basename = originalName.split("/").pop()!;
+    if (basename !== originalName) map.set(basename, url);
+  }
 
   return map;
 }
